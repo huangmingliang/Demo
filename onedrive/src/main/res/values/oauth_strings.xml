@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="oauth_app_id">f1b373c8-ed21-47d1-b4a5-b73ace0ba4b5</string>
+    <string name="oauth_redirect_uri">msalf1b373c8-ed21-47d1-b4a5-b73ace0ba4b5</string>
+    <string-array name="oauth_scopes">
+        <item>User.Read</item>
+        <item>Files.ReadWrite</item>
+    </string-array>
+</resources>

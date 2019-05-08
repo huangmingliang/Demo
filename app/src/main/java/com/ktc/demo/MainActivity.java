@@ -20,8 +20,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
-import com.ktc.googledrive.GoogleDriveActivity;
-import com.ktc.googledrive.TestActivity;
 import com.ktc.onedrive.AuthenticationHelper;
 import com.ktc.onedrive.GraphHelper;
 import com.microsoft.graph.concurrency.ICallback;

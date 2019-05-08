@@ -17,6 +17,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.exoplayer.PlayerActivity;
 import com.ktc.onedrive.adapter.FileAdapter;
 import com.microsoft.graph.concurrency.ICallback;
 import com.microsoft.graph.core.ClientException;
@@ -92,7 +93,9 @@ public class OneDriveActivity extends AppCompatActivity {
                     graphHelper.getDriveItemById(getDriveCallback(), item.id);
                     records.add(item.id);
                 } else {
-                    Toast.makeText(activity, "暂不支持预览", Toast.LENGTH_SHORT).show();
+                    //String url=item.getRawObject().get("@microsoft.graph.downloadUrl").toString();
+                    String url="https://graph.microsoft.com/v1.0/me/drive/items/"+item.id+"/content";
+                    PlayerActivity.navToPlayer(activity,url,accessToken);
                 }
             }
         });
@@ -118,13 +121,14 @@ public class OneDriveActivity extends AppCompatActivity {
 
 
     // Handles the authentication result
+    private String accessToken;
     public AuthenticationCallback getAuthCallback() {
         return new AuthenticationCallback() {
 
             @Override
             public void onSuccess(AuthenticationResult authenticationResult) {
                 // Log the token for debug purposes
-                String accessToken = authenticationResult.getAccessToken();
+                accessToken = authenticationResult.getAccessToken();
                 Log.d("hml", String.format("Access token: %s", accessToken));
                 items.clear();
                 graphHelper.getDriveRootChildren(accessToken, getDriveCallback());

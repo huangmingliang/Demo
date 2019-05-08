@@ -38,4 +38,5 @@ dependencies {
     }
     implementation 'com.google.android.gms:play-services-gcm:16.0.0'
     implementation 'com.squareup.picasso:picasso:2.71828'
+    api project(path: ':share')
 }

@@ -11,6 +11,8 @@
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/googledrive" />
             <option value="$PROJECT_DIR$/onedrive" />
+            <option value="$PROJECT_DIR$/player-lib" />
+            <option value="$PROJECT_DIR$/share" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

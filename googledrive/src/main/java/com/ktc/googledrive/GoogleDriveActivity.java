@@ -1,9 +1,12 @@
 package com.ktc.googledrive;
 
 import android.app.Activity;
+import android.app.ActivityManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -24,8 +27,17 @@ import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
 import com.google.gson.Gson;
 import com.ktc.googledrive.dao.GAccount;
+import com.ktc.share.SpUtil;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
+
+import net.openid.appauth.AuthState;
+import net.openid.appauth.AuthorizationException;
+import net.openid.appauth.AuthorizationRequest;
+import net.openid.appauth.AuthorizationResponse;
+import net.openid.appauth.AuthorizationService;
+import net.openid.appauth.AuthorizationServiceConfiguration;
+import net.openid.appauth.TokenResponse;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -36,19 +48,13 @@ import okhttp3.Call;
 
 public class GoogleDriveActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private static String CLIENT_ID = "1061473829028-5hcks8vhbivqocsa2tnet2i8rjn5vvv9.apps.googleusercontent.com";
-    //Use your own client id
-    private static String CLIENT_SECRET = "IvCnfwdK728mKCAwPXHhu9rS";
-    //Use your own client secret
-    private static String REDIRECT_URI = "http://localhost";
-    private static String GRANT_TYPE = "authorization_code";
-    private final String REFRESH_TOKEN = "refresh_token";
-    private static String TOKEN_URL = "https://oauth2.googleapis.com/token";
+    private final String CLIENT_ID = "75554621124-e96rprvnhp0kne5ji83apb79esvna73j.apps.googleusercontent.com";
+    private final String OAUTH_URL = "https://accounts.google.com/o/oauth2/auth";
+    private final String TOKEN_URL = "https://oauth2.googleapis.com/token";
+    private final String REDIRECT_URI = "com.ktc.demo:/oauth2callback";
+    private final String USED_INTENT="USED_INTENT";
+    private final String SCOPES="https://www.googleapis.com/auth/drive" + " https://www.googleapis.com/auth/userinfo.profile";   //中间空格分隔
 
-
-    private SharedPreferences preferences;
-    private SharedPreferences.Editor editor;
-    private int REQUEST_CODE = 1;
     GoogleAuthenticationHelper googleHelper;
     private TextView tvPath;
     private ProgressBar pb;
@@ -126,62 +132,99 @@ public class GoogleDriveActivity extends AppCompatActivity implements View.OnCli
         activity=this;
         sub = getIntent().getStringExtra("sub");
         googleHelper = GoogleAuthenticationHelper.getInstance(this);
-        preferences = getSharedPreferences("google_drive", Context.MODE_PRIVATE);
-        editor = preferences.edit();
         if (TextUtils.isEmpty(sub)) {
-            Intent intent = new Intent(this, WebActivity.class);
-            startActivityForResult(intent, REQUEST_CODE);
+            signIn();
         } else {
             refreshToken();
         }
     }
 
+    private void signIn(){
+        AuthorizationServiceConfiguration serviceConfiguration = new AuthorizationServiceConfiguration(
+                Uri.parse(OAUTH_URL) /* auth endpoint */,
+                Uri.parse(TOKEN_URL) /* token endpoint */
+        );
+        AuthorizationService authorizationService = new AuthorizationService(activity);
+        Uri redirectUri = Uri.parse(REDIRECT_URI);
+        AuthorizationRequest.Builder builder = new AuthorizationRequest.Builder(
+                serviceConfiguration,
+                CLIENT_ID,
+                AuthorizationRequest.RESPONSE_TYPE_CODE,
+                redirectUri
+        );
+        builder.setScopes(SCOPES);
+        AuthorizationRequest request = builder.build();
+        String action = "com.google.codelabs.appauth.HANDLE_AUTHORIZATION_RESPONSE";
+        Intent postAuthorizationIntent = new Intent(action);
+        PendingIntent pendingIntent = PendingIntent.getActivity(activity, request.hashCode(), postAuthorizationIntent, 0);
+        authorizationService.performAuthorizationRequest(request, pendingIntent);
+    }
+
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_CODE && resultCode == RESULT_OK) {
-            getToken();
-        } else {
-            Log.e("hml", "resultCode=" + resultCode);
+    protected void onStart() {
+        super.onStart();
+        checkIntent(getIntent());
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        checkIntent(intent);
+    }
+
+    private void checkIntent(@Nullable Intent intent) {
+        if (intent != null) {
+            String action = intent.getAction();
+            if (TextUtils.isEmpty(action)){
+                return;
+            }
+            switch (action) {
+                case "com.google.codelabs.appauth.HANDLE_AUTHORIZATION_RESPONSE":
+                    if (!intent.hasExtra(USED_INTENT)) {
+                        ActivityManager am= (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+                        am.killBackgroundProcesses("com.android.browser");
+                        handleAuthorizationResponse(intent);
+                        intent.putExtra(USED_INTENT, true);
+                    }
+                    break;
+                default:
+                    // do nothing
+            }
         }
     }
 
-    private void getToken() {
-        OkHttpUtils
-                .post()
-                .url(TOKEN_URL)
-                .addParams("code", preferences.getString("code", ""))
-                .addParams("client_id", CLIENT_ID)
-                .addParams("client_secret", CLIENT_SECRET)
-                .addParams("redirect_uri", REDIRECT_URI)
-                .addParams("grant_type", GRANT_TYPE)
-                .build()
-                .execute(new StringCallback() {
-                    @Override
-                    public void onError(Call call, Exception e, int id) {
-                        Log.e("hml", "e=" + e.fillInStackTrace().toString());
+    private void handleAuthorizationResponse(@NonNull Intent intent) {
+        AuthorizationResponse response = AuthorizationResponse.fromIntent(intent);
+        AuthorizationException error = AuthorizationException.fromIntent(intent);
+        final AuthState authState = new AuthState(response, error);
+        if (response != null) {
+            AuthorizationService service = new AuthorizationService(this);
+            service.performTokenRequest(response.createTokenExchangeRequest(), new AuthorizationService.TokenResponseCallback() {
+                @Override
+                public void onTokenRequestCompleted(@Nullable TokenResponse tokenResponse, @Nullable AuthorizationException exception) {
+                    if (exception != null) {
+                    } else {
+                        if (tokenResponse != null) {
+                            String uploadFilePath=SpUtil.getUploadFilePath();
+                            if (TextUtils.isEmpty(uploadFilePath)){
+                                getRootFile(tokenResponse.accessToken);
+                            }else {
+                                //uploadFile(tokenResponse.accessToken,uploadFilePath);
+                            }
+                            refreshUserInfo(tokenResponse.accessToken,tokenResponse.refreshToken);
+                        }
                     }
-
-                    @Override
-                    public void onResponse(String response, int id) {
-                        Gson gson = new Gson();
-                        TokenInfo tokenInfo = gson.fromJson(response, TokenInfo.class);
-                        //Log.e("hml", "access_token=" + tokenInfo.access_token);
-                        //Log.e("hml", "refresh_token=" + tokenInfo.refresh_token);
-                        editor.putString("refresh_token", tokenInfo.refresh_token);
-                        editor.putString("access_token", tokenInfo.access_token);
-                        editor.commit();
-                        refreshUserInfo();
-                        getRootFile(tokenInfo.access_token);
-                    }
-                });
+                }
+            });
+        }else {
+            Log.e("hml","error="+authState.toJsonString());
+        }
     }
 
     private void getRootFile(String accessToken){
         driveHelper.queryRootFiles(accessToken).addOnSuccessListener(new OnSuccessListener<File>() {
             @Override
             public void onSuccess(File file) {
-                Log.e("hml","file:"+file.toString());
+                Log.d("hml","file:"+file.toString());
                 String query = "'" + file.getId() + "' in parents";
                 list(query);
             }
@@ -199,30 +242,38 @@ public class GoogleDriveActivity extends AppCompatActivity implements View.OnCli
                 .url(TOKEN_URL)
                 .addParams("refresh_token", refreshToken)
                 .addParams("client_id", CLIENT_ID)
-                .addParams("client_secret", CLIENT_SECRET)
-                .addParams("grant_type", REFRESH_TOKEN)
+                .addParams("grant_type", "refresh_token")
                 .build()
                 .execute(new StringCallback() {
                     @Override
                     public void onError(Call call, Exception e, int id) {
                         Log.e("hml", "e=" + e.toString());
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(activity,"自动登录失败",Toast.LENGTH_SHORT).show();
+                            }
+                        });
                     }
 
                     @Override
                     public void onResponse(String response, int id) {
                         Gson gson = new Gson();
                         TokenInfo tokenInfo = gson.fromJson(response, TokenInfo.class);
-                        //Log.e("hml", "access_token2=" + tokenInfo.access_token);
-                        editor.putString("access_token", tokenInfo.access_token);
-                        editor.commit();
-                        getRootFile(tokenInfo.access_token);
+                        String uploadFilePath= SpUtil.getUploadFilePath();
+                        if (TextUtils.isEmpty(uploadFilePath)){
+                            getRootFile(tokenInfo.access_token);
+                        }else {
+                            //uploadFile(tokenInfo.access_token,uploadFilePath);
+                        }
                     }
                 });
     }
 
     private void list(String query) {
         try {
-            driveHelper.listFiles(query, null, true)
+            String fields="files(hasThumbnail,id,imageMediaMetadata(height,width),mimeType,modifiedTime,name,size,thumbnailLink,videoMediaMetadata/durationMillis)";
+            driveHelper.listFiles(query, fields, true)
                     .addOnSuccessListener(new OnSuccessListener<FileList>() {
                         @Override
                         public void onSuccess(FileList fileList) {
@@ -244,11 +295,11 @@ public class GoogleDriveActivity extends AppCompatActivity implements View.OnCli
         }
     }
 
-    private void refreshUserInfo() {
+    private void refreshUserInfo(String accessToken, final String refreshToken) {
         OkHttpUtils
                 .post()
                 .url("https://www.googleapis.com/oauth2/v3/userinfo")
-                .addHeader("Authorization", "Bearer" + preferences.getString("access_token", ""))
+                .addHeader("Authorization", "Bearer" + accessToken)
                 .build()
                 .execute(new StringCallback() {
                     @Override
@@ -260,8 +311,7 @@ public class GoogleDriveActivity extends AppCompatActivity implements View.OnCli
                     public void onResponse(String response, int id) {
                         Gson gson = new Gson();
                         UserInfo userInfo = gson.fromJson(response, UserInfo.class);
-                        //Log.e("hml", "userInfo=" + gson.toJson(userInfo));
-                        GAccount account = new GAccount(userInfo.sub, preferences.getString("refresh_token", ""), userInfo.name, userInfo.picture);
+                        GAccount account = new GAccount(userInfo.sub, refreshToken, userInfo.name, userInfo.picture);
                         googleHelper.saveAccount(account);
                     }
                 });

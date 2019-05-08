@@ -2,9 +2,25 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.ktc.googledrive">
 
+    <uses-permission android:name="android.permission.KILL_BACKGROUND_PROCESSES" />
     <application>
-        <activity android:name=".GoogleDriveActivity" />
-        <activity android:name=".WebActivity" />
+        <activity android:name=".GoogleDriveActivity"
+            android:launchMode="singleTask">
+            <intent-filter>
+                <action android:name="com.google.codelabs.appauth.HANDLE_AUTHORIZATION_RESPONSE"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
+
+        <activity android:name="net.openid.appauth.RedirectUriReceiverActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="com.ktc.demo"/>
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

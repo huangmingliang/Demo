@@ -23,29 +23,17 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.widget.ProgressBar;
 
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
-import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.ExoPlayerFactory;
-import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.ui.PlayerView;
-import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
-import com.google.android.exoplayer2.upstream.FileDataSourceFactory;
-import com.google.android.exoplayer2.upstream.cache.CacheDataSource;
 import com.google.android.exoplayer2.util.Util;
-
-import java.io.File;
-import java.util.Collections;
-
-
-import static com.google.android.exoplayer2.Player.STATE_READY;
 
 
 /**
@@ -60,12 +48,12 @@ public class PlayerActivity extends AppCompatActivity {
     private long playbackPosition=0;
 
     private String url;
-    private String name;
+    private String mAccessToken;
 
-    public static void navToPlayerActivity(Context context,String...params){
+    public static void navToPlayer(Context context,String url,String mAccessToken){
         Intent intent=new Intent(context,PlayerActivity.class);
-        intent.putExtra("url",params[0]);
-        intent.putExtra("name",params[1]);
+        intent.putExtra("url",url);
+        intent.putExtra("accessToken",mAccessToken);
         context.startActivity(intent);
     }
 
@@ -74,18 +62,8 @@ public class PlayerActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_player);
         url=getIntent().getStringExtra("url");
-        name=getIntent().getStringExtra("name");
+        mAccessToken=getIntent().getStringExtra("accessToken");
         initView();
-    }
-
-    private void init(){
-      /*  DownloadRequest downloadRequest = new DownloadRequest(
-                contentId,
-                DownloadRequest.TYPE_PROGRESSIVE,
-                contentUri,
-                *//* streamKeys= *//* Collections.emptyList(),
-                *//* customCacheKey= *//* null,
-                appData);*/
     }
 
     @Override
@@ -113,23 +91,22 @@ public class PlayerActivity extends AppCompatActivity {
         player = ExoPlayerFactory.newSimpleInstance(
                 new DefaultRenderersFactory(this),
                 new DefaultTrackSelector(), new DefaultLoadControl());
-        player.addListener(new ComponentListener());
+
         playerView.setPlayer(player);
+
         player.setPlayWhenReady(playWhenReady);
         player.seekTo(currentWindow, playbackPosition);
-        //if (file.exists()){
-            Uri uri = Uri.parse(url);
-            Log.e("hml","uri="+uri.toString());
-            MediaSource mediaSource = buildMediaSource(uri);
-            player.prepare(mediaSource, true, false);
-        /*}else {
-            Log.e("hml","file is not exists");
-        }*/
+        Log.d("hml","url="+url);
+        Uri uri = Uri.parse(url);
+        MediaSource mediaSource = buildMediaSource(uri);
+        player.prepare(mediaSource, true, false);
     }
 
     private MediaSource buildMediaSource(Uri uri) {
-        DataSource.Factory dataSourceFactory=new DefaultHttpDataSourceFactory("exoplayer-codelab");
-        return new ExtractorMediaSource.Factory(dataSourceFactory).
+        DefaultHttpDataSourceFactory defaultHttpDataSourceFactory=new DefaultHttpDataSourceFactory("demo");
+        defaultHttpDataSourceFactory.getDefaultRequestProperties().set("Authorization","Bearer " + mAccessToken);
+        return new ExtractorMediaSource.Factory(
+                defaultHttpDataSourceFactory).
                 createMediaSource(uri);
     }
 
@@ -166,17 +143,6 @@ public class PlayerActivity extends AppCompatActivity {
             playWhenReady = player.getPlayWhenReady();
             player.release();
             player = null;
-        }
-    }
-
-    private class ComponentListener extends Player.DefaultEventListener{
-        @Override
-        public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-            super.onPlayerStateChanged(playWhenReady, playbackState);
-            switch (playbackState){
-                case STATE_READY:
-                    break;
-            }
         }
     }
 }

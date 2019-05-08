@@ -24,4 +24,5 @@ dependencies {
     api 'com.google.code.gson:gson:2.8.5'
     api 'de.hdodenhof:circleimageview:3.0.0'
     implementation 'com.squareup.picasso:picasso:2.71828'
+    implementation project(path: ':player-lib')
 }

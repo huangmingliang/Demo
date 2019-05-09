@@ -21,6 +21,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.exoplayer.ImageActivity;
+import com.example.exoplayer.PlayerActivity;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.api.services.drive.model.File;
@@ -55,7 +57,8 @@ public class GoogleDriveActivity extends AppCompatActivity implements View.OnCli
     private final String USED_INTENT="USED_INTENT";
     private final String SCOPES="https://www.googleapis.com/auth/drive" + " https://www.googleapis.com/auth/userinfo.profile";   //中间空格分隔
 
-    GoogleAuthenticationHelper googleHelper;
+    private GoogleAuthenticationHelper googleHelper;
+    private String accessToken;
     private TextView tvPath;
     private ProgressBar pb;
     private TextView tvEmpty;
@@ -103,6 +106,9 @@ public class GoogleDriveActivity extends AppCompatActivity implements View.OnCli
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 File item = items.get(position);
+
+
+
                 if (item.getMimeType().equals("application/vnd.google-apps.folder")) {
                     items.clear();
                     setEmptyView(true);
@@ -110,7 +116,18 @@ public class GoogleDriveActivity extends AppCompatActivity implements View.OnCli
                     list(query);
                     records.add(item.getId());
                 } else {
-                    Toast.makeText(activity, "暂不支持预览", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(activity, "暂不支持预览", Toast.LENGTH_SHORT).show();
+                    String url="https://www.googleapis.com/drive/v3/files/"+item.getId()+"?alt=media";
+                    String mimeType=item.getMimeType();
+                    if (mimeType.startsWith("image/")) {
+                        ImageActivity.navToImageActivity(activity,url,accessToken);
+                    } else if (mimeType.startsWith("audio/")) {
+                        PlayerActivity.navToPlayer(activity,url,accessToken);
+                    } else if (mimeType.startsWith("video/")) {
+                        PlayerActivity.navToPlayer(activity,url,accessToken);
+                    } else{
+
+                    }
                 }
             }
         });
@@ -206,6 +223,7 @@ public class GoogleDriveActivity extends AppCompatActivity implements View.OnCli
                         if (tokenResponse != null) {
                             String uploadFilePath=SpUtil.getUploadFilePath();
                             if (TextUtils.isEmpty(uploadFilePath)){
+                                accessToken=tokenResponse.accessToken;
                                 getRootFile(tokenResponse.accessToken);
                             }else {
                                 //uploadFile(tokenResponse.accessToken,uploadFilePath);
@@ -260,6 +278,7 @@ public class GoogleDriveActivity extends AppCompatActivity implements View.OnCli
                     public void onResponse(String response, int id) {
                         Gson gson = new Gson();
                         TokenInfo tokenInfo = gson.fromJson(response, TokenInfo.class);
+                        accessToken=tokenInfo.access_token;
                         String uploadFilePath= SpUtil.getUploadFilePath();
                         if (TextUtils.isEmpty(uploadFilePath)){
                             getRootFile(tokenInfo.access_token);

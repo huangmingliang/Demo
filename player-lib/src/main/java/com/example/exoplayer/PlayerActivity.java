@@ -49,11 +49,12 @@ public class PlayerActivity extends AppCompatActivity {
 
     private String url;
     private String mAccessToken;
+    private String platform;
 
-    public static void navToPlayer(Context context,String url,String mAccessToken){
+    public static void navToPlayer(Context context,String...params){
         Intent intent=new Intent(context,PlayerActivity.class);
-        intent.putExtra("url",url);
-        intent.putExtra("accessToken",mAccessToken);
+        intent.putExtra("url",params[0]);
+        intent.putExtra("accessToken",params[1]);
         context.startActivity(intent);
     }
 
@@ -93,7 +94,6 @@ public class PlayerActivity extends AppCompatActivity {
                 new DefaultTrackSelector(), new DefaultLoadControl());
 
         playerView.setPlayer(player);
-
         player.setPlayWhenReady(playWhenReady);
         player.seekTo(currentWindow, playbackPosition);
         Log.d("hml","url="+url);

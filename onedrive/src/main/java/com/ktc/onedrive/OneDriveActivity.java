@@ -17,6 +17,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.exoplayer.ImageActivity;
 import com.example.exoplayer.PlayerActivity;
 import com.ktc.onedrive.adapter.FileAdapter;
 import com.microsoft.graph.concurrency.ICallback;
@@ -93,9 +94,18 @@ public class OneDriveActivity extends AppCompatActivity {
                     graphHelper.getDriveItemById(getDriveCallback(), item.id);
                     records.add(item.id);
                 } else {
-                    //String url=item.getRawObject().get("@microsoft.graph.downloadUrl").toString();
+                    String mimeType=item.file.mimeType;
                     String url="https://graph.microsoft.com/v1.0/me/drive/items/"+item.id+"/content";
-                    PlayerActivity.navToPlayer(activity,url,accessToken);
+                    if (mimeType.startsWith("image/")) {
+                        ImageActivity.navToImageActivity(activity,url,accessToken);
+                    } else if (mimeType.startsWith("audio/")) {
+                        PlayerActivity.navToPlayer(activity,url,accessToken);
+                    } else if (mimeType.startsWith("video/")) {
+                        PlayerActivity.navToPlayer(activity,url,accessToken);
+                    } else{
+
+                    }
+
                 }
             }
         });

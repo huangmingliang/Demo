@@ -33,11 +33,11 @@ dependencies {
     implementation 'net.openid:appauth:0.2.0'
     implementation 'com.zhy:okhttputils:2.6.2'
     implementation 'com.google.apis:google-api-services-drive:v3-rev160-1.25.0'
-    implementation('com.google.api-client:google-api-client-android:1.23.0') {
+    api('com.google.api-client:google-api-client-android:1.23.0') {
         exclude group: 'org.apache.httpcomponents'
     }
-    implementation 'com.google.android.gms:play-services-gcm:16.0.0'
+    api 'com.google.android.gms:play-services-gcm:16.0.0'
     implementation 'com.squareup.picasso:picasso:2.71828'
-    api project(path: ':share')
+    implementation project(':share')
     implementation project(path: ':player-lib')
 }

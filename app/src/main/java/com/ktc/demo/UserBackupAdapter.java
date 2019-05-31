@@ -7,9 +7,6 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-
-import com.ktc.onedrive.R;
-
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -59,11 +56,7 @@ public class UserBackupAdapter extends BaseAdapter {
             holder.profileImage.setImageResource(R.drawable.ic_add_user);
             holder.tvUserName.setVisibility(View.GONE);
         }else {
-            if ("micro".equals(account.type)){
-                holder.profileImage.setImageResource(R.mipmap.mis_odc_files_cell_icon);
-            }else {
-                holder.profileImage.setImageResource(R.mipmap.mis_odc_files_cell_icon);
-            }
+            holder.profileImage.setImageResource(R.drawable.ic_cloud_user_default);
             holder.tvUserName.setVisibility(View.VISIBLE);
             holder.tvUserName.setText(account.name);
         }

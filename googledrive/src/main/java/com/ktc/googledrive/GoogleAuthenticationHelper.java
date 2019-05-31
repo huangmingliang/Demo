@@ -78,4 +78,17 @@ public class GoogleAuthenticationHelper {
         return account;
     }
 
+    public boolean removeUser(GAccount gAccount){
+        if (gAccount==null){
+            Log.e("hml","param is null");
+            return false;
+        }
+        int result=db.delete(AccountEntry.TABLE_NAME,AccountEntry.SUB+"=?",new String[]{gAccount.sub});
+        if (result!=0){
+            return true;
+        }else {
+            return false;
+        }
+    }
+
 }

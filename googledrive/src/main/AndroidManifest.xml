@@ -18,7 +18,7 @@
 
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
-                <data android:scheme="com.ktc.demo"/>
+                <data android:scheme="com.jrm.localmm"/>
             </intent-filter>
         </activity>
     </application>

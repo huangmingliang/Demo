@@ -1,1 +1,1 @@
-include ':app', ':onedrive', ':googledrive', ':player-lib', ':share'
+include ':app', ':player-lib', ':share', ':onedrive', ':googledrive'

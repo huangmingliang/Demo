@@ -21,8 +21,10 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
@@ -42,6 +44,8 @@ import com.google.android.exoplayer2.util.Util;
 public class PlayerActivity extends AppCompatActivity {
 
     private PlayerView playerView;
+    private TextView tvAudio;
+    private View audioView;
     private SimpleExoPlayer player;
     private boolean playWhenReady=false;
     private int currentWindow=0;
@@ -49,13 +53,20 @@ public class PlayerActivity extends AppCompatActivity {
 
     private String url;
     private String mAccessToken;
-    private String platform;
+    private String name;
 
     public static void navToPlayer(Context context,String...params){
         Intent intent=new Intent(context,PlayerActivity.class);
-        intent.putExtra("url",params[0]);
-        intent.putExtra("accessToken",params[1]);
-        context.startActivity(intent);
+        try {
+            intent.putExtra("url",params[0]);
+            intent.putExtra("accessToken",params[1]);
+            intent.putExtra("name",params[2]);
+        }catch (Exception e){
+            Log.e("hml","e="+e.toString());
+        }finally {
+            context.startActivity(intent);
+        }
+
     }
 
     @Override
@@ -64,6 +75,7 @@ public class PlayerActivity extends AppCompatActivity {
         setContentView(R.layout.activity_player);
         url=getIntent().getStringExtra("url");
         mAccessToken=getIntent().getStringExtra("accessToken");
+        name=getIntent().getStringExtra("name");
         initView();
     }
 
@@ -86,6 +98,14 @@ public class PlayerActivity extends AppCompatActivity {
 
     private void initView() {
         playerView = findViewById(R.id.video_view);
+        audioView=findViewById(R.id.audio_View);
+        tvAudio=findViewById(R.id.tv_audio);
+
+        if (!TextUtils.isEmpty(name)){
+            audioView.setVisibility(View.VISIBLE);
+            tvAudio.setText(name);
+        }
+
     }
 
     private void initializePlayer() {

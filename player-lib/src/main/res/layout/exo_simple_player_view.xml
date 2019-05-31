@@ -24,6 +24,31 @@
 
   </com.google.android.exoplayer2.ui.AspectRatioFrameLayout>
 
+  <LinearLayout
+      android:id="@+id/audio_View"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:visibility="gone"
+      android:layout_gravity="center"
+      android:orientation="vertical">
+    <TextView
+        android:id="@+id/tv_audio"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:textSize="30sp"
+        android:text="歌名"
+        android:textColor="#ffffff"/>
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="25dp"
+        android:src="@mipmap/ic_player_audio"/>
+
+  </LinearLayout>
+
   <View android:id="@+id/exo_controller_placeholder"
       android:layout_width="match_parent"
       android:layout_height="match_parent"/>

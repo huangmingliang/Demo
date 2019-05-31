@@ -11,8 +11,10 @@ import com.google.android.gms.tasks.Tasks;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.googleapis.media.MediaHttpDownloaderProgressListener;
+import com.google.api.client.googleapis.media.MediaHttpUploaderProgressListener;
 import com.google.api.client.googleapis.services.AbstractGoogleClientRequest;
 import com.google.api.client.googleapis.services.GoogleClientRequestInitializer;
+import com.google.api.client.http.FileContent;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.drive.Drive;
@@ -103,7 +105,6 @@ public class DriveHelper {
         return Tasks.call(mExecutor, new Callable<Void>() {
             @Override
             public Void call() throws Exception {
-
                 Drive.Files.Get get = drive.files().get(id);
                 get.getMediaHttpDownloader().setProgressListener(listener);
                 get.executeMediaAndDownloadTo(outputStream);
@@ -118,6 +119,29 @@ public class DriveHelper {
             @Override
             public Void call() throws Exception {
                 return drive.files().delete(fileId).execute();
+            }
+        });
+    }
+
+    public Task<File> uploadFile(String accessToken, String filePath, MediaHttpUploaderProgressListener listener) throws IOException {//上传文件
+        if (TextUtils.isEmpty(filePath)){
+            Log.e("hml","filePath is null");
+            return null;
+        }
+        if (!TextUtils.isEmpty(accessToken)){
+            this.accessToken=accessToken;
+        }
+        File meta=new File();
+        java.io.File file=new java.io.File(filePath);
+        meta.setName(file.getName());
+        final FileContent content=new FileContent(null,file);
+        final Drive.Files.Create create=drive.files().create(meta,content);
+        create.getMediaHttpUploader().setProgressListener(listener);
+        return Tasks.call(mExecutor, new Callable<File>() {
+            @Override
+            public File call() throws Exception {
+                return create.setFields("id")
+                        .execute();
             }
         });
     }

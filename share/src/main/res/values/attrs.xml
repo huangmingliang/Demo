@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="RoundCornerImageView">
+        <attr format="reference|dimension" name="fullRadius"/>
+        <attr format="reference|dimension" name="topRightRadius"/>
+        <attr format="reference|dimension" name="bottomRightRadius"/>
+        <attr format="reference|dimension" name="topLeftRadius"/>
+        <attr format="reference|dimension" name="bottomLeftRadius"/>
+    </declare-styleable>
+</resources>

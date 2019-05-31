@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="268dp"
+    android:layout_height="177dp"
+    android:background="@color/white">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="27dp"
+        android:background="#ff495d80"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textColor="@color/white"
+            android:layout_marginLeft="18dp"
+            android:textSize="10sp"
+            android:text="@string/cloud_storage"/>
+
+        <ImageView
+            android:id="@+id/iv_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="10dp"
+            android:src="@drawable/ic_cancel"/>
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="33dp"
+        android:orientation="horizontal"
+        android:layout_gravity="center_horizontal">
+
+        <RelativeLayout
+            android:id="@+id/rl_google"
+            android:layout_width="74dp"
+            android:layout_height="84dp"
+            android:background="@drawable/rectangle_cloud_platform_item">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="21dp"
+                android:src="@drawable/ic_google"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_alignParentBottom="true"
+                android:layout_marginBottom="17dp"
+                android:text="@string/google_drive"
+                android:textSize="8sp"
+                android:textColor="#202020"/>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/rl_micro"
+            android:layout_width="74dp"
+            android:layout_height="84dp"
+            android:layout_marginLeft="25dp"
+            android:background="@drawable/rectangle_cloud_platform_item">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="21dp"
+                android:src="@drawable/ic_micro"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_alignParentBottom="true"
+                android:layout_marginBottom="17dp"
+                android:text="@string/one_drive"
+                android:textSize="8sp"
+                android:textColor="#202020"/>
+
+        </RelativeLayout>
+    </LinearLayout>
+
+</LinearLayout>

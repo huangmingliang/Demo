@@ -69,6 +69,10 @@ public class AuthenticationHelper {
         }
     }
 
+    public boolean removeUser(IAccount iAccount){
+        return mPCA.removeAccount(iAccount);
+    }
+
 
     public List<IAccount> getAccounts(){
         List<IAccount> accounts=new ArrayList<>();

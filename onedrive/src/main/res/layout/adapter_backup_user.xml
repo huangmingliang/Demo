@@ -1,29 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="80dp"
-    android:layout_height="wrap_content"
-    android:background="@android:color/white"
-    android:gravity="center_horizontal"
-    android:paddingLeft="3dp"
-    android:paddingRight="3dp"
-    android:paddingTop="10dp"
-    android:paddingBottom="10dp">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical" android:layout_width="83dp"
+    android:layout_height="108dp"
+    android:background="@drawable/rectangle_cloud_user_item">
 
-    <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/profile_image"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:src="@drawable/ic_add_user"/>
-
-    <TextView
-        android:id="@+id/tv_userName"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:singleLine="true"
-        android:visibility="gone"
-        android:ellipsize="middle"
-        android:textColor="@android:color/black"
-        android:layout_marginTop="10dp"
-        android:text="用户名字"/>
+        android:layout_centerInParent="true"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/profile_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_add_user"/>
 
-</LinearLayout>
+        <TextView
+            android:id="@+id/tv_userName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@+id/profile_image"
+            android:singleLine="true"
+            android:visibility="gone"
+            android:ellipsize="middle"
+            android:textColor="#212121"
+            android:textSize="12sp"
+            android:layout_marginTop="16dp"
+            android:text="用户名字"/>
+    </LinearLayout>
+
+
+
+</RelativeLayout>

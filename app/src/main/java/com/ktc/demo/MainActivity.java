@@ -16,12 +16,14 @@ import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
 import com.ktc.onedrive.AuthenticationHelper;
 import com.ktc.onedrive.GraphHelper;
+import com.ktc.share.DensityUtil;
 import com.microsoft.graph.concurrency.ICallback;
 import com.microsoft.graph.core.ClientException;
 import com.microsoft.graph.extensions.UploadSession;
@@ -59,6 +61,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         activity=this;
         helper=AuthenticationHelper.getInstance(getApplicationContext());
         graphHelper=GraphHelper.getInstance();
+        DisplayMetrics metrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        int width = metrics.widthPixels;
+        int height = metrics.heightPixels;
+        float scale = getResources().getDisplayMetrics().density;
+        Log.d("hml","width="+ DensityUtil.px2dip(this,width) +" height="+DensityUtil.px2dip(this,height)+" scale="+scale);
         initView();
     }
 
